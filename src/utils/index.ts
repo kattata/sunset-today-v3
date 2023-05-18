@@ -2,9 +2,7 @@ export const getRemainingTime = (sunsetTime: string) => {
   const now = new Date().getTime();
   const sunset = new Date(sunsetTime).getTime();
   
-  const distance = sunset - 1683027639;
-  console.log(distance);
-
+  const distance = sunset - now;
   if (distance < 0) {
     return {
       hours: "00",
@@ -18,10 +16,9 @@ export const getRemainingTime = (sunsetTime: string) => {
     hours: getHours(distance),
     minutes: getMinutes(distance),
     seconds: getSeconds(distance),
-    hasPassed: false,
   };
 
-  return countdown;
+  return { hasPassed: false, countdown };
 };
 
 const getSeconds = (distance: number) => {
