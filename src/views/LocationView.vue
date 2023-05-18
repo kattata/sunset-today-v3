@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { getRemainingTime } from '@/utils';
+import { fetchLocationByTerm, getCurrentLocation } from '@/utils';
 import { onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { zonedTimeToUtc } from 'date-fns-tz';
 import type { Coordinates, Countdown } from '@/types';
+import { useCountdown } from '@/composables/useCountdown';
 
 const route = useRoute();
 const position = ref<Coordinates>({
@@ -19,27 +20,20 @@ const countdown = ref<Countdown>({
 });
 const hasPassed = ref<boolean>(false);
 
-function getGeolocation (){
-  
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(((geolocation: any) => {
-      position.value = {
-        lat: geolocation.coords.latitude,
-        lng: geolocation.coords.longitude
+async function getGeolocation (){
+  const { data, error } = await getCurrentLocation();
+  if(data) {
+    position.value = {
+        lat: data.lat,
+        lng: data.lng
       };
-    }));
   } else {
-    errorMessage.value = "Geolocation is not supported by this browser.";
+    errorMessage.value = error;
   }
 }
 
-async function getLocation() {
-  const res = await fetch(`https://api.api-ninjas.com/v1/geocoding?city=${route.query.term}`, {
-    headers: {
-      'X-Api-Key': import.meta.env.VITE_API_KEY
-    }
-  });
-  const data = await res.json();
+async function getLocationByTerm() {
+  const { data } = await fetchLocationByTerm(String(route.query.term));
   position.value = {
     lat: data[0].latitude,
     lng: data[0].longitude
@@ -59,7 +53,7 @@ onMounted(() => {
   if(route.query.term === 'current') {
     getGeolocation();
   } else {
-    getLocation();
+    getLocationByTerm();
   }
 })
 
@@ -72,7 +66,7 @@ watch(position, () => {
 })
 
 setInterval(() => {
-  const { countdown: _countdown, hasPassed: _hasPassed } = getRemainingTime(sunsetTime.value);
+  const { countdown: _countdown, hasPassed: _hasPassed } = useCountdown(sunsetTime.value);
   countdown.value =  _countdown || { hours: '00', minutes: '00', seconds: '00' };
   hasPassed.value = _hasPassed;
 }, 1000)
