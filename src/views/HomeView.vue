@@ -23,7 +23,7 @@ function handleCurrentLocationSearch() {
   <main class="home">
     <section class="home__content">
       <h1 class="home__headline">Sunset Today</h1>
-      <p class="home__subheadline">Find out how much time is left until the sunset near your location.</p>
+      <p class="home__subheadline">Find out how much time is left until the sunset near your location</p>
       <form @submit.prevent="handleLocationSearch">
         <BaseInput class="home__input" v-model="searchTerm" placeholder="Type in a city and press enter" />
         <p>or</p>
