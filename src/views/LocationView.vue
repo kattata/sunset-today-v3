@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { fetchLocationByTerm, getCurrentLocation } from '@/utils';
+import { fetchLocationByTerm, getCurrentLocation, fetchSunsetTime } from '@/utils';
 import { onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
-import { zonedTimeToUtc } from 'date-fns-tz';
 import type { Coordinates, Countdown } from '@/types';
 import { useCountdown } from '@/composables/useCountdown';
+import { useDateFormatter } from '@/composables/useDateFormatter';
 
 const route = useRoute();
 const position = ref<Coordinates>({
@@ -19,6 +19,7 @@ const countdown = ref<Countdown>({
   seconds: '00'
 });
 const hasPassed = ref<boolean>(false);
+const { formatDateAndTime } = useDateFormatter();
 
 async function getGeolocation (){
   const { data, error } = await getCurrentLocation();
@@ -34,19 +35,18 @@ async function getGeolocation (){
 
 async function getLocationByTerm() {
   const { data } = await fetchLocationByTerm(String(route.query.term));
-  position.value = {
-    lat: data[0].latitude,
-    lng: data[0].longitude
-  };
+  
+  if(data) {
+    position.value = {
+      lat: data[0].latitude,
+      lng: data[0].longitude
+    };
+  }
 }
 
-async function fetchSunsetTime () {
-  const res = await fetch(`https://api.sunrise-sunset.org/json?lat=${position.value.lat}&lng=${position.value.lng}&formatted=0&timezone=UTC`);
-  const data = await res.json();
-
-  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const utcDate = zonedTimeToUtc(data.results.sunset, timezone); 
-  sunsetTime.value = String(utcDate);
+async function getSunsetTime () {
+  const sunset = await fetchSunsetTime(position.value.lat, position.value.lng);
+  sunsetTime.value = sunset;
 }
 
 onMounted(() => {
@@ -62,8 +62,8 @@ watch(position, () => {
     return;
   }
 
-  fetchSunsetTime();
-})
+  getSunsetTime();
+}, {immediate: true})
 
 setInterval(() => {
   const { countdown: _countdown, hasPassed: _hasPassed } = useCountdown(sunsetTime.value);
@@ -76,9 +76,9 @@ setInterval(() => {
 
 <template>
   <div class="location">
-    <p class="location__sunset-time">{{ sunsetTime }}</p>
-    <p>{{ errorMessage }}</p>
-    <p>{{ countdown?.hours }}:{{ countdown?.minutes }}:{{ countdown?.seconds }}</p>
+    <p class="location__sunset-time">{{ formatDateAndTime(sunsetTime) }}</p>
+    <p v-if="errorMessage">{{ errorMessage }}</p>
+    <p v-else>{{ countdown?.hours }}:{{ countdown?.minutes }}:{{ countdown?.seconds }}</p>
   </div>
 </template>
 

@@ -1,0 +1,9 @@
+@font-face {
+  font-family: "Chromate";
+  src: url("../fonts/Chromate-Regular.otf") format("opentype");
+}
+
+@font-face {
+  font-family: "Questrial";
+  src: url("../fonts/Questrial-Regular.ttf") format("truetype");
+}

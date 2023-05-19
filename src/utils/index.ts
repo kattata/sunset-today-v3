@@ -1,3 +1,5 @@
+import { zonedTimeToUtc } from "date-fns-tz";
+
 export async function fetchLocationByTerm(term: string) {
   const res = await fetch(`https://api.api-ninjas.com/v1/geocoding?city=${term}`, {
     headers: {
@@ -5,6 +7,7 @@ export async function fetchLocationByTerm(term: string) {
     }
   });
   const data = await res.json();
+  
   return data;
 }
 
@@ -32,4 +35,13 @@ export async function getCurrentLocation() {
     }
   }
   return response;
+}
+
+export async function fetchSunsetTime (lat: string, lng: string) {
+  const res = await fetch(`https://api.sunrise-sunset.org/json?lat=${lat}&lng=${lng}&formatted=0&timezone=UTC`);
+  const data = await res.json();
+
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const utcDate = zonedTimeToUtc(data.results.sunset, timezone); 
+  return String(utcDate);
 }

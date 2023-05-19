@@ -1,19 +1,15 @@
-@font-face {
-  font-family: "Chromate";
-  src: url("../fonts/Chromate-Regular.otf") format("opentype");
-}
+@import "_variables.css";
+@import "_fonts.css";
+@import "_typography.css";
 
-@font-face {
-  font-family: "Questrial";
-  src: url("../fonts/Questrial-Regular.ttf") format("truetype");
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
   font-family: "Questrial";
+  overflow: hidden;
 }
 
-h1 {
-  font-family: "Chromate";
-  font-weight: 400;
-  font-size: 50px;
-}

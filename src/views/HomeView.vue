@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import BaseBackground from '@/components/base/BaseBackground.vue';
+import BaseInput from '@/components/base/BaseBackground.vue';
 
 
 const router = useRouter();
@@ -17,6 +19,7 @@ function handleCurrentLocationSearch() {
 </script>
 
 <template>
+  <BaseBackground />
   <main>
     <h1>Sunset Today</h1>
     <p>Find out how much time is left until the sunset near your location.</p>
@@ -30,3 +33,19 @@ function handleCurrentLocationSearch() {
     <p>Powered by SunriseSunset.io</p>
   </main>
 </template>
+
+<style scoped lang="postcss">
+main {
+  position: absolute;
+  left: 50%;
+  top: 100px;
+  transform: translateX(-50%);
+  text-align: center;
+  color: var(--color-white);
+
+  h1 {
+    font-family: "Chromate";
+    font-size: 100px;
+  }
+}
+</style>
