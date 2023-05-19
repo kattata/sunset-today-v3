@@ -82,6 +82,9 @@ setInterval(() => {
   </div>
 </template>
 
-<style>
+<style lang="postcss" scoped>
+.location {
+  color: black;
+}
 
 </style>

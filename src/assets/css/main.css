@@ -9,7 +9,7 @@
 }
 
 body {
-  font-family: "Questrial";
+  font-family: var(--font-family-base);
   overflow: hidden;
 }
 

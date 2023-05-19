@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-export default () => {
+module.exports = () => {
   return {
     plugins: [
       require('postcss-nested')(),
