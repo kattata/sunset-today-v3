@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { fetchLocationByTerm, getCurrentLocation, fetchSunsetTime, fetchBackground } from '@/utils';
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import type { Coordinates, Countdown } from '@/types';
 import { useCountdown } from '@/composables/useCountdown';
@@ -81,13 +81,16 @@ setInterval(() => {
   hasPassed.value = _hasPassed;
 }, 1000)
 
+const sunsetText = computed(() => {
+  return route.query.term === 'current' ? 'Until sunset in your location' : `Until sunset in ${route.query.term}`;
+})
+
 
 </script>
 
 <template>
   <main class="location">
     <img v-if="background" class="location__background" :src="background" alt="Background"/>
-    <div v-else class="location__background-placeholder"></div>
     <div class="location__header">
       <RouterLink to="/" class="location__back">
         <img src="@/assets/icons/arrow.svg"/>
@@ -102,7 +105,7 @@ setInterval(() => {
       <p v-if="errorMessage">{{ errorMessage }}</p>
       <div v-else>
         <p class="location__countdown">{{ countdown?.hours }}:{{ countdown?.minutes }}:{{ countdown?.seconds }}</p>
-        <p>Until sunset in {{ route.query.term }}</p>
+        <p>{{ sunsetText }}</p>
       </div>
     </section>
   </main>
@@ -112,17 +115,12 @@ setInterval(() => {
 .location {
   color: var(--color-white);
   text-transform: uppercase;
+  background: var(--color-primary);
 
   &__background {
     width: 100vw;
     height: 100vh;
     filter: brightness(0.5);
-  }
-  
-  &__background-placeholder {
-    width: 100vw;
-    height: 100vh;
-    background: var(--color-primary);
   }
 
   &__header {
@@ -162,7 +160,7 @@ setInterval(() => {
     font-family: "Chromate";
     font-size: 100px;
     white-space: nowrap;
-    margin-bottom: 32px;
+    margin-bottom: 16px;
   }
 }
 

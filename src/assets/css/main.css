@@ -9,6 +9,7 @@
 }
 
 body {
+  background: var(--color-primary);
   font-family: var(--font-family-base);
   overflow: hidden;
 }
