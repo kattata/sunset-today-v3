@@ -4,12 +4,7 @@ export function useCountdown(sunsetTime: string) {
   
   const distance = sunset - now;
   if (distance < 0) {
-    return {
-      hours: "00",
-      minutes: "00",
-      seconds: "00",
-      hasPassed: true,
-    };
+    return { hasPassed: true, countdown: { hours: '00', minutes: '00', seconds: '00' }};
   }
 
   const getSeconds = (distance: number) => {

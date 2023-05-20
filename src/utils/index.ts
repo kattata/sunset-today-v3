@@ -6,8 +6,8 @@ export async function fetchLocationByTerm(term: string) {
       'X-Api-Key': import.meta.env.VITE_NINJA_API_KEY
     }
   });
-  const data = await res.json();
   
+  const data = await res.json();
   return data;
 }
 

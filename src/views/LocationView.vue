@@ -9,11 +9,12 @@ import { useDateFormatter } from '@/composables/useDateFormatter';
 const route = useRoute();
 const background = ref<string>('');
 const position = ref<Coordinates>({
-  lat: '0',
-  lng: '0'
+  lat: '',
+  lng: ''
 });
 const sunsetTime = ref<string>('');
 const errorMessage = ref<string>('');
+const loading = ref<boolean>(true);
 const countdown = ref<Countdown>({
   hours: '00',
   minutes: '00',
@@ -22,22 +23,28 @@ const countdown = ref<Countdown>({
 const hasPassed = ref<boolean>(false);
 const { formatDateAndTime } = useDateFormatter();
 
-async function getGeolocation (){
+async function getGeolocation() {
   const { data, error } = await getCurrentLocation();
-  if(data) {
+  if (data) {
     position.value = {
-        lat: data.lat,
-        lng: data.lng
-      };
+      lat: data.lat,
+      lng: data.lng
+    };
   } else {
     errorMessage.value = error;
   }
 }
 
 async function getLocationByTerm() {
-  const { data } = await fetchLocationByTerm(String(route.query.term));
-  
-  if(data) {
+  const res = await fetch(`https://api.api-ninjas.com/v1/geocoding?city=${route.query.term}`, {
+    headers: {
+      'X-Api-Key': import.meta.env.VITE_NINJA_API_KEY
+    }
+  });
+
+  const data = await res.json();
+
+  if (data) {
     position.value = {
       lat: data[0].latitude,
       lng: data[0].longitude
@@ -45,39 +52,42 @@ async function getLocationByTerm() {
   }
 }
 
-async function getSunsetTime () {
-  const sunset = await fetchSunsetTime(position.value.lat, position.value.lng);
-  sunsetTime.value = sunset;
+async function getSunsetTime() {
+    const sunset = await fetchSunsetTime(position.value.lat, position.value.lng);
+    sunsetTime.value = sunset;
 }
 
-async function getBackground () {
+watch(() => route.query, () => {
+  if(route.query.term === 'current') {
+    getGeolocation();
+    getSunsetTime();
+  } else {
+    getLocationByTerm()
+    .then(() => getSunsetTime());
+    loading.value = false;
+  }
+}, { immediate: true })
+
+async function getBackground() {
   const backgroundUrl = await fetchBackground();
-  if(!backgroundUrl) {
+  if (!backgroundUrl) {
     return background.value = '';
   }
-  background.value = backgroundUrl;  
+  background.value = backgroundUrl;
 }
 
 onMounted(() => {
   getBackground();
-  if(route.query.term === 'current') {
-    getGeolocation();
-  } else {
-    getLocationByTerm();
-  }
+  // if(route.query.term === 'current') {
+  //   getGeolocation();
+  // } else {
+  // getLocationByTerm();
+  // }
 })
-
-watch(position, () => {
-  if(!position.value.lat || !position.value.lng) {
-    return;
-  }
-
-  getSunsetTime();
-}, {immediate: true})
 
 setInterval(() => {
   const { countdown: _countdown, hasPassed: _hasPassed } = useCountdown(sunsetTime.value);
-  countdown.value =  _countdown || { hours: '00', minutes: '00', seconds: '00' };
+  countdown.value = _countdown || { hours: '00', minutes: '00', seconds: '00' };
   hasPassed.value = _hasPassed;
 }, 1000)
 
@@ -85,15 +95,14 @@ const sunsetText = computed(() => {
   return route.query.term === 'current' ? 'Until sunset in your location' : `Until sunset in ${route.query.term}`;
 })
 
-
 </script>
 
 <template>
   <main class="location">
-    <img v-if="background" class="location__background" :src="background" alt="Background"/>
+    <img v-if="background" class="location__background" :src="background" alt="Background" />
     <div class="location__header">
       <RouterLink to="/" class="location__back">
-        <img src="@/assets/icons/arrow.svg"/>
+        <img src="@/assets/icons/arrow.svg" />
         <div>Back</div>
       </RouterLink>
       <div>
@@ -102,8 +111,10 @@ const sunsetText = computed(() => {
       </div>
     </div>
     <section class="location__content">
-      <p v-if="errorMessage">{{ errorMessage }}</p>
+      <!-- <p v-if="errorMessage">{{ errorMessage }}</p> -->
+      <p v-if="loading" class="location__countdown">00:00:00</p>
       <div v-else>
+        <p>{{ hasPassed ? 'You missed it 😓' : '' }}</p>
         <p class="location__countdown">{{ countdown?.hours }}:{{ countdown?.minutes }}:{{ countdown?.seconds }}</p>
         <p>{{ sunsetText }}</p>
       </div>
@@ -138,7 +149,7 @@ const sunsetText = computed(() => {
       height: 12px;
     }
   }
-  
+
   &__back {
     display: flex;
     justify-content: space-between;
@@ -163,5 +174,4 @@ const sunsetText = computed(() => {
     margin-bottom: 16px;
   }
 }
-
 </style>
