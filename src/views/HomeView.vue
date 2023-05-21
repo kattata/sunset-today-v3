@@ -19,21 +19,23 @@ function handleCurrentLocationSearch() {
 </script>
 
 <template>
-  <BaseBackground />
-  <main class="home">
-    <section class="home__content">
-      <h1 class="home__headline">Sunset Today</h1>
-      <p class="home__subheadline">Find out how much time is left until the sunset near your location</p>
-      <form @submit.prevent="handleLocationSearch">
-        <BaseInput class="home__input" v-model="searchTerm" placeholder="Type in a city and press enter" />
-        <p>or</p>
-      </form>
-      <form @submit.prevent="handleCurrentLocationSearch">
-        <BaseButton class="home__button" type="submit">Use my location</BaseButton>
-      </form>
-    </section>
-    <p class="home__credit">Powered by <a href="https://sunrise-sunset.org/api">sunrise-sunset.org</a></p>
-  </main>
+  <div>
+    <BaseBackground />
+    <main class="home">
+      <section class="home__content">
+        <h1 class="home__headline">Sunset Today</h1>
+        <p class="home__subheadline">Find out how much time is left until the sunset near your location</p>
+        <form @submit.prevent="handleLocationSearch">
+          <BaseInput class="home__input" v-model="searchTerm" placeholder="Type in a city and press enter" />
+          <p>or</p>
+        </form>
+        <form @submit.prevent="handleCurrentLocationSearch">
+          <BaseButton class="home__button" type="submit">Use my location</BaseButton>
+        </form>
+      </section>
+      <p class="home__credit">Powered by <a href="https://sunrise-sunset.org/api">sunrise-sunset.org</a></p>
+    </main>
+  </div>
 </template>
 
 <style lang="postcss" scoped>
@@ -47,13 +49,13 @@ function handleCurrentLocationSearch() {
     left: 50%;
     transform: translateX(-50%);
   }
-  
+
   &__headline {
     font-family: "Chromate";
     font-size: 100px;
     white-space: nowrap;
     margin-bottom: 16px;
-    
+
     @media (max-width: 768px) {
       font-size: 44px;
     }
@@ -64,15 +66,15 @@ function handleCurrentLocationSearch() {
   }
 
   &__input {
-      width: 300px;
-      text-align: center;
-      margin-bottom: 16px;
+    width: 300px;
+    text-align: center;
+    margin-bottom: 16px;
   }
 
   &__button {
     margin-top: 16px;
   }
-  
+
   &__credit {
     left: 50%;
     transform: translateX(-50%);

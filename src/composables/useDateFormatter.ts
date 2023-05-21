@@ -4,7 +4,7 @@ export function useDateFormatter() {
   
   function formatDateAndTime(date: string) {
     const dateObj = new Date(date);
-    return format(dateObj, 'dd.MM.yyyy HH:mm');
+    return format(dateObj, 'HH:mm');
   }
 
   return {

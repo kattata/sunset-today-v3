@@ -28,5 +28,6 @@ const buttonClasses = computed(() => {
   border-radius: 24px;
   cursor: pointer;
   color: var(--color-black);
+  font-weight: 300;
 }
 </style>
