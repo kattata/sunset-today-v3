@@ -1,3 +1,4 @@
+import type { UnsplashResponse } from "@/types";
 import { zonedTimeToUtc } from "date-fns-tz";
 
 export async function fetchLocationByTerm(term: string) {
@@ -25,5 +26,13 @@ export async function fetchBackground () {
   const res = await fetch(`https://api.unsplash.com/photos/random?client_id=${apiKey}&query=sunset`);
   const data = await res.json();
 
-  return data.urls.regular;
+  const response: UnsplashResponse = {
+    url: data.urls.regular,
+    credits: {
+      author: data.user.name,
+      profileUrl: `${data.user.links.html}?utm_source=SunsetTodayV3&utm_medium=referral`
+    }
+  };
+  
+  return response;
 }

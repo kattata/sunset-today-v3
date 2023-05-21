@@ -2,7 +2,7 @@
 import { fetchSunsetTime, fetchBackground, fetchLocationByTerm } from '@/utils';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
-import type { Coordinates, Countdown } from '@/types';
+import type { Coordinates, Countdown, UnsplashCredits } from '@/types';
 import { useCountdown } from '@/composables/useCountdown';
 import { useDateFormatter } from '@/composables/useDateFormatter';
 
@@ -10,6 +10,7 @@ const route = useRoute();
 const { formatDateAndTime } = useDateFormatter();
 
 const background = ref<string>('');
+const credits = ref<UnsplashCredits | null>(null);
 const lng = ref<Coordinates['lng']>(0);
 const lat = ref<Coordinates['lat']>(0);
 const sunsetTime = ref<string>('');
@@ -42,13 +43,13 @@ async function getSunsetTime() {
 }
 
 async function getBackground() {
-  const backgroundUrl = await fetchBackground();
+  const {url, credits: _credits } = await fetchBackground();
 
-  if (!backgroundUrl) {
+  if (!url) {
     return background.value = '';
   }
-
-  background.value = backgroundUrl;
+  credits.value = _credits;
+  background.value = url;
 }
 
 function getCurrentLocation() {
@@ -94,6 +95,7 @@ setInterval(() => {
 <template>
   <main class="location">
     <img v-if="background" class="location__background" :src="background" alt="Background" />
+    <p v-if="credits" class="location__credit">Photo by <a :href="credits.profileUrl">{{ credits.author }}</a> on <a href="https://unsplash.com/?utm_source=SunsetTodayV3&utm_medium=referral">Unsplash</a></p>
     <div class="location__header">
       <RouterLink to="/" class="location__back">
         <img src="@/assets/icons/arrow.svg" />
@@ -166,6 +168,19 @@ setInterval(() => {
     font-size: 100px;
     white-space: nowrap;
     margin-bottom: 16px;
+  }
+
+  &__credit {
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    position: absolute;
+    bottom: 50px;
+    opacity: 0.7;
+
+    a {
+      color: var(--color-white);
+    }
   }
 }
 </style>

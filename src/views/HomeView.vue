@@ -32,7 +32,7 @@ function handleCurrentLocationSearch() {
         <BaseButton class="home__button" type="submit">Use my location</BaseButton>
       </form>
     </section>
-    <p class="home__credit">Powered by SunriseSunset.io</p>
+    <p class="home__credit">Powered by <a href="https://sunrise-sunset.org/api">sunrise-sunset.org</a></p>
   </main>
 </template>
 
@@ -71,12 +71,15 @@ function handleCurrentLocationSearch() {
   
   &__credit {
     left: 50%;
-    text-transform: capitalize;
     transform: translateX(-50%);
     font-size: 12px;
     position: absolute;
     bottom: 50px;
     opacity: 0.7;
+
+    a {
+      color: var(--color-white);
+    }
   }
 }
 </style>
