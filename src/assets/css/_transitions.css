@@ -1,0 +1,46 @@
+/* Fade */
+.fade-enter-from {
+  opacity: 0;
+}
+
+.fade-enter-active {
+  transition: opacity 200ms ease-in;
+}
+
+.fade-leave-to {
+  opacity: 0;
+}
+
+.fade-leave-active {
+  transition: opacity 200ms ease-out;
+}
+
+/* Fade in */
+.fade-in-enter-active { transition: all 0.3s ease-out; }
+
+.fade-in-enter-from {
+  opacity: 0;
+  transform: translateY(40px);
+}
+
+.fade-in-leave-to { 
+  opacity: 0; 
+  transform: translateY(-40px);
+}
+
+/* Route */
+.route-enter-from {
+  opacity: 0;
+}
+
+.route-enter-active {
+  transition: opacity 300ms ease-in;
+}
+
+.route-leave-to {
+  opacity: 0;
+}
+
+.route-leave-active {
+  transition: opacity 300ms ease-out;
+}

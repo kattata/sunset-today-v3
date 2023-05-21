@@ -74,7 +74,7 @@ function handleCurrentLocationSearch() {
     transform: translateX(-50%);
     font-size: 12px;
     position: absolute;
-    bottom: 50px;
+    bottom: 16px;
     opacity: 0.7;
 
     a {

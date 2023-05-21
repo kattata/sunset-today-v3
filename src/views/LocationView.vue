@@ -17,11 +17,7 @@ const sunsetTime = ref<string>('');
 const errorMessage = ref<string>('');
 const loading = ref<boolean>(true);
 const hasPassed = ref<boolean>(false);
-const countdown = ref<Countdown>({
-  hours: '00',
-  minutes: '00',
-  seconds: '00'
-});
+const countdown = ref<Countdown | null>(null);
 
 const sunsetText = computed(() => {
   return route.query.term === 'current' ? 'Until sunset in your location' : `Until sunset in ${route.query.term}`;
@@ -85,7 +81,7 @@ watch([lng, lat], () => {
 setInterval(() => {
   if (!loading.value) {
     const { countdown: _countdown, hasPassed: _hasPassed } = useCountdown(sunsetTime.value);
-    countdown.value = _countdown || { hours: '00', minutes: '00', seconds: '00' };
+    countdown.value = _countdown || null;
     hasPassed.value = _hasPassed;
   }
 }, 1000)
@@ -94,7 +90,9 @@ setInterval(() => {
 
 <template>
   <main class="location">
-    <img v-if="background" class="location__background" :src="background" alt="Background" />
+    <Transition name="fade">
+      <img v-if="background" class="location__background" :src="background" alt="Background" />
+    </Transition>
     <p v-if="credits" class="location__credit">Photo by <a :href="credits.profileUrl">{{ credits.author }}</a> on <a href="https://unsplash.com/?utm_source=SunsetTodayV3&utm_medium=referral">Unsplash</a></p>
     <div class="location__header">
       <RouterLink to="/" class="location__back">
@@ -108,12 +106,13 @@ setInterval(() => {
     </div>
     <section class="location__content">
       <p v-if="errorMessage">{{ errorMessage }}</p>
-      <p v-if="loading" class="location__countdown">00:00:00</p>
-      <div v-else>
-        <p>{{ hasPassed ? 'You missed it 😓' : '' }}</p>
-        <p class="location__countdown">{{ countdown?.hours }}:{{ countdown?.minutes }}:{{ countdown?.seconds }}</p>
-        <p>{{ sunsetText }}</p>
-      </div>
+      <Transition name="fade-in">
+        <div v-if="countdown">
+          <p>{{ hasPassed ? 'You missed it 😓' : '' }}</p>
+          <p class="location__countdown">{{ countdown?.hours }}:{{ countdown?.minutes }}:{{ countdown?.seconds }}</p>
+          <p>{{ sunsetText }}</p>
+        </div>
+      </Transition>
     </section>
   </main>
 </template>
@@ -175,7 +174,7 @@ setInterval(() => {
     transform: translateX(-50%);
     font-size: 12px;
     position: absolute;
-    bottom: 50px;
+    bottom: 16px;
     opacity: 0.7;
 
     a {
@@ -183,4 +182,5 @@ setInterval(() => {
     }
   }
 }
+
 </style>

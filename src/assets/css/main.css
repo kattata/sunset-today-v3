@@ -1,6 +1,7 @@
 @import "_variables.css";
 @import "_fonts.css";
 @import "_typography.css";
+@import "_transitions.css";
 
 * {
   margin: 0;
