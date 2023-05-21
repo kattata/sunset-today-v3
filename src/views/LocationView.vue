@@ -123,6 +123,10 @@ setInterval(() => {
   text-transform: uppercase;
   background: var(--color-primary);
 
+  @media (max-width: 768px) {
+    background-color: var(--color-white);
+  }
+
   &__background {
     width: 100vw;
     height: 100vh;

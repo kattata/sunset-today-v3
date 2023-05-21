@@ -27,5 +27,6 @@ const buttonClasses = computed(() => {
   text-transform: uppercase;
   border-radius: 24px;
   cursor: pointer;
+  color: var(--color-black);
 }
 </style>

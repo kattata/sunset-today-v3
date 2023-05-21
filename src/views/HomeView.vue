@@ -55,7 +55,6 @@ function handleCurrentLocationSearch() {
     margin-bottom: 16px;
     
     @media (max-width: 768px) {
-      white-space: normal;
       font-size: 44px;
     }
   }
