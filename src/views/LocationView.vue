@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { fetchLocationByTerm, getCurrentLocation, fetchSunsetTime, fetchBackground } from '@/utils';
+import { fetchSunsetTime, fetchBackground } from '@/utils';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import type { Coordinates, Countdown } from '@/types';
@@ -8,10 +8,8 @@ import { useDateFormatter } from '@/composables/useDateFormatter';
 
 const route = useRoute();
 const background = ref<string>('');
-const position = ref<Coordinates>({
-  lat: '',
-  lng: ''
-});
+const lng = ref<Coordinates['lng']>(0);
+const lat = ref<Coordinates['lat']>(0);
 const sunsetTime = ref<string>('');
 const errorMessage = ref<string>('');
 const loading = ref<boolean>(true);
@@ -23,18 +21,6 @@ const countdown = ref<Countdown>({
 const hasPassed = ref<boolean>(false);
 const { formatDateAndTime } = useDateFormatter();
 
-async function getGeolocation() {
-  const { data, error } = await getCurrentLocation();
-  if (data) {
-    position.value = {
-      lat: data.lat,
-      lng: data.lng
-    };
-  } else {
-    errorMessage.value = error;
-  }
-}
-
 async function getLocationByTerm() {
   const res = await fetch(`https://api.api-ninjas.com/v1/geocoding?city=${route.query.term}`, {
     headers: {
@@ -45,28 +31,26 @@ async function getLocationByTerm() {
   const data = await res.json();
 
   if (data) {
-    position.value = {
-      lat: data[0].latitude,
-      lng: data[0].longitude
-    };
+    lat.value = data[0].latitude;
+    lng.value = data[0].longitude;
   }
 }
 
 async function getSunsetTime() {
-    const sunset = await fetchSunsetTime(position.value.lat, position.value.lng);
-    sunsetTime.value = sunset;
+  const sunset = await fetchSunsetTime(lat.value, lng.value);
+  sunsetTime.value = sunset;
 }
 
-watch(() => route.query, () => {
-  if(route.query.term === 'current') {
-    getGeolocation();
-    getSunsetTime();
-  } else {
-    getLocationByTerm()
-    .then(() => getSunsetTime());
-    loading.value = false;
-  }
-}, { immediate: true })
+if (route.query.term === 'current') {
+  watch([lng, lat], () => {
+    if (lat.value === 0 && lng.value === 0) {
+      return;
+    }
+
+    getSunsetTime()
+      .then(() => loading.value = false);
+  }, { immediate: true })
+}
 
 async function getBackground() {
   const backgroundUrl = await fetchBackground();
@@ -76,19 +60,28 @@ async function getBackground() {
   background.value = backgroundUrl;
 }
 
-onMounted(() => {
-  getBackground();
-  // if(route.query.term === 'current') {
-  //   getGeolocation();
-  // } else {
-  // getLocationByTerm();
-  // }
+onMounted(async () => {
+  // getBackground();
+  if (route.query.term === 'current') {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position: any) => {
+        lng.value = position.coords.longitude;
+        lat.value = position.coords.latitude;
+      })
+    }
+  } else {
+    getLocationByTerm()
+      .then(() => getSunsetTime())
+      .then(() => loading.value = false)
+  }
 })
 
 setInterval(() => {
-  const { countdown: _countdown, hasPassed: _hasPassed } = useCountdown(sunsetTime.value);
-  countdown.value = _countdown || { hours: '00', minutes: '00', seconds: '00' };
-  hasPassed.value = _hasPassed;
+  if (!loading.value) {
+    const { countdown: _countdown, hasPassed: _hasPassed } = useCountdown(sunsetTime.value);
+    countdown.value = _countdown || { hours: '00', minutes: '00', seconds: '00' };
+    hasPassed.value = _hasPassed;
+  }
 }, 1000)
 
 const sunsetText = computed(() => {
@@ -107,11 +100,11 @@ const sunsetText = computed(() => {
       </RouterLink>
       <div>
         <span>Sunset at </span>
-        <span>{{ formatDateAndTime(sunsetTime) }}</span>
+        <span>{{ sunsetTime && formatDateAndTime(sunsetTime) }}</span>
       </div>
     </div>
     <section class="location__content">
-      <!-- <p v-if="errorMessage">{{ errorMessage }}</p> -->
+      <p v-if="errorMessage">{{ errorMessage }}</p>
       <p v-if="loading" class="location__countdown">00:00:00</p>
       <div v-else>
         <p>{{ hasPassed ? 'You missed it 😓' : '' }}</p>

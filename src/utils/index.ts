@@ -11,33 +11,36 @@ export async function fetchLocationByTerm(term: string) {
   return data;
 }
 
-export async function getCurrentLocation() {
-  const response = {
-    data: {
-      lat: '0',
-      lng: '0'
-    },
-    error: ''
-  };
+export function getCurrentLocation() {
+  // const response = {
+  //     lat: 0,
+  //     lng: 0
+  // };
 
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(((geolocation: any) => {
-      response.data =  {
-        lat: geolocation.coords.latitude,
-        lng: geolocation.coords.longitude
-      };
-    }));
-  } else {
-    response.error = "Geolocation is not supported by this browser.";
-    response.data = {
-      lat: '0',
-      lng: '0'
-    }
-  }
+  let response = {};
+
+  // if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition((position: any) => {
+      // return {
+        // response.lat = position.coords.latitude;
+        // response.lng = position.coords.longitude;
+        response = position.coords;
+      // }
+    });
+  // } else {
+  //   console.log("Geolocation is not supported by this browser.");
+  // }
+  // else {
+  //   response.error = "Geolocation is not supported by this browser.";
+  //   response.data = {
+  //     lat: 0,
+  //     lng: 0
+  //   }
+  // }
   return response;
 }
 
-export async function fetchSunsetTime (lat: string, lng: string) {
+export async function fetchSunsetTime (lat: number, lng: number) {
   const res = await fetch(`https://api.sunrise-sunset.org/json?lat=${lat}&lng=${lng}&formatted=0&timezone=UTC`);
   const data = await res.json();
 
