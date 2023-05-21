@@ -53,6 +53,11 @@ function handleCurrentLocationSearch() {
     font-size: 100px;
     white-space: nowrap;
     margin-bottom: 32px;
+    
+    @media (max-width: 768px) {
+      white-space: normal;
+      font-size: 44px;
+    }
   }
 
   &__subheadline {
@@ -76,6 +81,7 @@ function handleCurrentLocationSearch() {
     position: absolute;
     bottom: 16px;
     opacity: 0.7;
+    text-align: center;
 
     a {
       color: var(--color-white);

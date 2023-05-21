@@ -127,6 +127,7 @@ setInterval(() => {
     width: 100vw;
     height: 100vh;
     filter: brightness(0.5);
+    object-fit: cover;
   }
 
   &__header {
@@ -167,6 +168,11 @@ setInterval(() => {
     font-size: 100px;
     white-space: nowrap;
     margin-bottom: 16px;
+
+    @media (max-width: 768px) {
+      white-space: normal;
+      font-size: 44px;
+    }
   }
 
   &__credit {
@@ -176,6 +182,7 @@ setInterval(() => {
     position: absolute;
     bottom: 16px;
     opacity: 0.7;
+    text-align: center;
 
     a {
       color: var(--color-white);
