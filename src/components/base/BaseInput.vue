@@ -27,6 +27,8 @@ input {
   text-transform: uppercase;
   color: var(--color-white);
   padding: 12px;
+  border-radius: 0;
+  outline: 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.7);
 
   &::placeholder {

@@ -52,7 +52,7 @@ function handleCurrentLocationSearch() {
     font-family: "Chromate";
     font-size: 100px;
     white-space: nowrap;
-    margin-bottom: 32px;
+    margin-bottom: 16px;
     
     @media (max-width: 768px) {
       white-space: normal;
@@ -61,7 +61,7 @@ function handleCurrentLocationSearch() {
   }
 
   &__subheadline {
-    margin-block: 16px;
+    margin-bottom: 32px;
   }
 
   &__input {
