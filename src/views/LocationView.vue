@@ -22,6 +22,11 @@ const countdown = ref<Countdown>({
   seconds: '00'
 });
 
+const sunsetText = computed(() => {
+  return route.query.term === 'current' ? 'Until sunset in your location' : `Until sunset in ${route.query.term}`;
+});
+
+// Data fetching
 async function getLocationByTerm() {
   const data = await fetchLocationByTerm(String(route.query.term));
 
@@ -48,37 +53,34 @@ async function getBackground() {
 
 function getCurrentLocation() {
   if (!navigator.geolocation) {
-      console.log('Geolocation is not supported by your browser');
-    }
+    console.log('Geolocation is not supported by your browser');
+  }
 
-    navigator.geolocation.getCurrentPosition((position: any) => {
-      lng.value = position.coords.longitude;
-      lat.value = position.coords.latitude;
-    })
+  navigator.geolocation.getCurrentPosition((position: any) => {
+    lng.value = position.coords.longitude;
+    lat.value = position.coords.latitude;
+  })
 }
 
 onMounted(async () => {
   getBackground();
   if (route.query.term === 'current') {
-    getCurrentLocation()
+    getCurrentLocation();
   } else {
-    getLocationByTerm()
-      .then(() => getSunsetTime())
-      .then(() => loading.value = false)
+    getLocationByTerm();
   }
 })
 
-if (route.query.term === 'current') {
-  watch([lng, lat], () => {
-    if (lat.value === 0 && lng.value === 0) {
-      return;
-    }
+watch([lng, lat], () => {
+  if (lat.value === 0 && lng.value === 0) {
+    return;
+  }
 
-    getSunsetTime()
-      .then(() => loading.value = false);
-  }, { immediate: true })
-}
+  getSunsetTime()
+    .then(() => loading.value = false);
+}, { immediate: true })
 
+// Initialize countdown
 setInterval(() => {
   if (!loading.value) {
     const { countdown: _countdown, hasPassed: _hasPassed } = useCountdown(sunsetTime.value);
@@ -86,10 +88,6 @@ setInterval(() => {
     hasPassed.value = _hasPassed;
   }
 }, 1000)
-
-const sunsetText = computed(() => {
-  return route.query.term === 'current' ? 'Until sunset in your location' : `Until sunset in ${route.query.term}`;
-})
 
 </script>
 
