@@ -39,7 +39,7 @@ async function getSunsetTime() {
 }
 
 async function getBackground() {
-  const {url, credits: _credits } = await fetchBackground();
+  const { url, credits: _credits } = await fetchBackground();
 
   if (!url) {
     return background.value = '';
@@ -89,32 +89,35 @@ setInterval(() => {
 </script>
 
 <template>
-  <main class="location">
-    <Transition name="fade">
-      <img v-if="background" class="location__background" :src="background" alt="Background" />
-    </Transition>
-    <p v-if="credits" class="location__credit">Photo by <a :href="credits.profileUrl">{{ credits.author }}</a> on <a href="https://unsplash.com/?utm_source=SunsetTodayV3&utm_medium=referral">Unsplash</a></p>
-    <div class="location__header">
-      <RouterLink to="/" class="location__back">
-        <img src="@/assets/icons/arrow.svg" />
-        <div>Back</div>
-      </RouterLink>
-      <div>
-        <span>Sunset at </span>
-        <span>{{ sunsetTime && formatDateAndTime(sunsetTime) }}</span>
-      </div>
-    </div>
-    <section class="location__content">
-      <p v-if="errorMessage">{{ errorMessage }}</p>
-      <Transition name="fade-in">
-        <div v-if="countdown">
-          <p>{{ hasPassed ? 'You missed it 😓' : '' }}</p>
-          <p class="location__countdown">{{ countdown?.hours }}:{{ countdown?.minutes }}:{{ countdown?.seconds }}</p>
-          <p>{{ sunsetText }}</p>
-        </div>
+  <div class="page">
+    <main class="location">
+      <Transition name="fade">
+        <img v-if="background" class="location__background" :src="background" alt="Background" />
       </Transition>
-    </section>
-  </main>
+      <p v-if="credits" class="location__credit">Photo by <a :href="credits.profileUrl">{{ credits.author }}</a> on <a
+          href="https://unsplash.com/?utm_source=SunsetTodayV3&utm_medium=referral">Unsplash</a></p>
+      <div class="location__header">
+        <RouterLink to="/" class="location__back">
+          <img src="@/assets/icons/arrow.svg" />
+          <div>Back</div>
+        </RouterLink>
+        <div>
+          <span>Sunset at </span>
+          <span>{{ sunsetTime && formatDateAndTime(sunsetTime) }}</span>
+        </div>
+      </div>
+      <section class="location__content">
+        <p v-if="errorMessage">{{ errorMessage }}</p>
+        <Transition name="fade-in">
+          <div v-if="countdown">
+            <p>{{ hasPassed ? 'You missed it 😓' : '' }}</p>
+            <p class="location__countdown">{{ countdown?.hours }}:{{ countdown?.minutes }}:{{ countdown?.seconds }}</p>
+            <p>{{ sunsetText }}</p>
+          </div>
+        </Transition>
+      </section>
+    </main>
+  </div>
 </template>
 
 <style lang="postcss" scoped>
@@ -143,6 +146,10 @@ setInterval(() => {
     top: 0;
     left: 0;
     width: 100%;
+
+    @media (max-width: 768px) {
+      font-size: 12px;
+    }
 
     img {
       width: 12px;
@@ -193,5 +200,4 @@ setInterval(() => {
     }
   }
 }
-
 </style>

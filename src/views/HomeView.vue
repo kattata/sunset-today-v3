@@ -19,7 +19,7 @@ function handleCurrentLocationSearch() {
 </script>
 
 <template>
-  <div>
+  <div class="page">
     <BaseBackground />
     <main class="home">
       <section class="home__content">
