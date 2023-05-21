@@ -29,5 +29,6 @@ const buttonClasses = computed(() => {
   cursor: pointer;
   color: var(--color-black);
   font-weight: 300;
+  font-size: 16px;
 }
 </style>
