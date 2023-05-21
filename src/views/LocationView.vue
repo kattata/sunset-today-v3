@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { fetchSunsetTime, fetchBackground } from '@/utils';
+import { fetchSunsetTime, fetchBackground, fetchLocationByTerm } from '@/utils';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import type { Coordinates, Countdown } from '@/types';
@@ -7,28 +7,23 @@ import { useCountdown } from '@/composables/useCountdown';
 import { useDateFormatter } from '@/composables/useDateFormatter';
 
 const route = useRoute();
+const { formatDateAndTime } = useDateFormatter();
+
 const background = ref<string>('');
 const lng = ref<Coordinates['lng']>(0);
 const lat = ref<Coordinates['lat']>(0);
 const sunsetTime = ref<string>('');
 const errorMessage = ref<string>('');
 const loading = ref<boolean>(true);
+const hasPassed = ref<boolean>(false);
 const countdown = ref<Countdown>({
   hours: '00',
   minutes: '00',
   seconds: '00'
 });
-const hasPassed = ref<boolean>(false);
-const { formatDateAndTime } = useDateFormatter();
 
 async function getLocationByTerm() {
-  const res = await fetch(`https://api.api-ninjas.com/v1/geocoding?city=${route.query.term}`, {
-    headers: {
-      'X-Api-Key': import.meta.env.VITE_NINJA_API_KEY
-    }
-  });
-
-  const data = await res.json();
+  const data = await fetchLocationByTerm(String(route.query.term));
 
   if (data) {
     lat.value = data[0].latitude;
@@ -41,6 +36,38 @@ async function getSunsetTime() {
   sunsetTime.value = sunset;
 }
 
+async function getBackground() {
+  const backgroundUrl = await fetchBackground();
+
+  if (!backgroundUrl) {
+    return background.value = '';
+  }
+
+  background.value = backgroundUrl;
+}
+
+function getCurrentLocation() {
+  if (!navigator.geolocation) {
+      console.log('Geolocation is not supported by your browser');
+    }
+
+    navigator.geolocation.getCurrentPosition((position: any) => {
+      lng.value = position.coords.longitude;
+      lat.value = position.coords.latitude;
+    })
+}
+
+onMounted(async () => {
+  getBackground();
+  if (route.query.term === 'current') {
+    getCurrentLocation()
+  } else {
+    getLocationByTerm()
+      .then(() => getSunsetTime())
+      .then(() => loading.value = false)
+  }
+})
+
 if (route.query.term === 'current') {
   watch([lng, lat], () => {
     if (lat.value === 0 && lng.value === 0) {
@@ -51,30 +78,6 @@ if (route.query.term === 'current') {
       .then(() => loading.value = false);
   }, { immediate: true })
 }
-
-async function getBackground() {
-  const backgroundUrl = await fetchBackground();
-  if (!backgroundUrl) {
-    return background.value = '';
-  }
-  background.value = backgroundUrl;
-}
-
-onMounted(async () => {
-  // getBackground();
-  if (route.query.term === 'current') {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((position: any) => {
-        lng.value = position.coords.longitude;
-        lat.value = position.coords.latitude;
-      })
-    }
-  } else {
-    getLocationByTerm()
-      .then(() => getSunsetTime())
-      .then(() => loading.value = false)
-  }
-})
 
 setInterval(() => {
   if (!loading.value) {
